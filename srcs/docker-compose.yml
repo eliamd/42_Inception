@@ -1,6 +1,17 @@
-
-
 #─────────────── NETWORK ─────────────────────
 networks:
   inception:
     driver: bridge
+
+#─────────────── SERVICES ─────────────────────
+services:
+  mariadb:
+    build: ./mariaDB
+    container_name: mariadb
+    env_file:
+      - .env
+    networks:
+      - inception
+    restart: always
+
+  # Ajoutez d'autres services ici (nginx, wordpress, etc.)
