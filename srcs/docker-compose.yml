@@ -1,0 +1,6 @@
+
+
+#─────────────── NETWORK ─────────────────────
+networks:
+  inception:
+    driver: bridge
