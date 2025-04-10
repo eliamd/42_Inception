@@ -23,10 +23,11 @@ RUN mkdir -p /var/run/nginx
 COPY conf/nginx.conf /etc/nginx/nginx.conf
 
 # ───────── 4 : Set permissions ─────────
-
 RUN chmod 755 /var/www/html
 RUN chown -R www-data:www-data /var/www/html
 
-# ───────── 5 : Launch NGINX ─────────
+# ───────── 5 : Expose port ─────────
+EXPOSE 443
 
+# ───────── 6 : Launch NGINX ─────────
 CMD ["nginx", "-g", "daemon off;"]

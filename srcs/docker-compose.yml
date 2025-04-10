@@ -3,6 +3,13 @@ networks:
   inception:
     driver: bridge
 
+#─────────────── VOLUMES ─────────────────────
+volumes:
+  mariadb_data:
+    name: inception_mariadb_data
+  wordpress_data:
+    name: inception_wordpress_data
+
 #─────────────── SERVICES ─────────────────────
 services:
   mariadb:
@@ -10,8 +17,43 @@ services:
     container_name: mariadb
     env_file:
       - .env
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - inception
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${SQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  wordpress:
+    build: ./WordPress
+    container_name: wordpress
+    env_file:
+      - .env
+    volumes:
+      - wordpress_data:/var/www/wordpress
+    depends_on:
+      mariadb:
+        condition: service_healthy
     networks:
       - inception
     restart: always
 
-  # Ajoutez d'autres services ici (nginx, wordpress, etc.)
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    env_file:
+      - .env
+    volumes:
+      - wordpress_data:/var/www/wordpress
+    depends_on:
+      - wordpress
+    networks:
+      - inception
+    ports:
+      - "443:443"
+    restart: always
