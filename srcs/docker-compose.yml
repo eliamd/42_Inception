@@ -7,8 +7,18 @@ networks:
 volumes:
   mariadb_data:
     name: inception_mariadb_data
+    driver: local
+    driver_opts:
+      type: none
+      device: /Users/eliam/DEV/inceptiondata/mariadb
+      o: bind
   wordpress_data:
     name: inception_wordpress_data
+    driver: local
+    driver_opts:
+      type: none
+      device: /Users/eliam/DEV/inceptiondata/wordpress
+      o: bind
 
 #─────────────── SERVICES ─────────────────────
 services:
