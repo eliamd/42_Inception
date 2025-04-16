@@ -37,7 +37,7 @@ if [ ! -f wp-config.php ]; then
     wp core install \
         --url=edetoh.42.fr \
         --title="Inception" \
-        --admin_user=eliamadmin \
+        --admin_user="${WORDPRESS_ADMIN_USER}" \
         --admin_password="${WORDPRESS_ADMIN_PASSWORD}" \
         --admin_email=admin@example.com \
         --allow-root || { echo "Erreur: Échec d'installation WordPress"; exit 1; }
