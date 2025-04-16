@@ -34,6 +34,39 @@ EOF
     fi
 }
 
+secure_mysql() {
+    log "Sécurisation de l'installation MariaDB"
+
+    # Script de sécurisation plus stricte
+    mysql -u root <<EOF
+-- Définir le mot de passe root
+UPDATE mysql.user SET Password=PASSWORD('${SQL_ROOT_PASSWORD}') WHERE User='root';
+-- S'assurer que le plugin d'authentification utilise le mot de passe
+UPDATE mysql.user SET plugin='' WHERE User='root';
+-- Supprimer les utilisateurs anonymes
+DELETE FROM mysql.user WHERE User='';
+-- Ne permettre la connexion de root que depuis localhost
+DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+-- Supprimer la base de test
+DROP DATABASE IF EXISTS test;
+DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
+-- Révoquer tous les privilèges globaux sur les utilisateurs non-root
+UPDATE mysql.user SET Grant_priv='N' WHERE User<>'root';
+-- Supprimer les utilisateurs avec un mot de passe vide
+DELETE FROM mysql.user WHERE Password='';
+-- Recharger les privilèges pour appliquer les changements
+FLUSH PRIVILEGES;
+EOF
+
+    # Vérifier que la sécurisation a fonctionné
+    if ! mysqladmin -u root -p"${SQL_ROOT_PASSWORD}" status &>/dev/null; then
+        log "ERREUR: La sécurisation de MariaDB a échoué"
+        exit 1
+    else
+        log "MariaDB sécurisé avec succès"
+    fi
+}
+
 # Initialisation du système de fichiers
 if [ ! -d "/var/lib/mysql/mysql" ]; then
     log "Première initialisation de MariaDB"
@@ -57,15 +90,10 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
         exit 1
     fi
 
-    mysql -u root <<EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '${SQL_ROOT_PASSWORD}';
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DROP DATABASE IF EXISTS test;
-DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-FLUSH PRIVILEGES;
-EOF
+    # Sécuriser l'installation
+    secure_mysql
 
+    # Créer la base de données et l'utilisateur
     create_db_and_user
 
     log "Arrêt du service temporaire MariaDB"
@@ -89,6 +117,10 @@ else
         sleep 1
     done
 
+    # Sécuriser l'installation existante
+    secure_mysql
+
+    # Vérifier/créer la base et l'utilisateur
     create_db_and_user
 
     log "Arrêt du service temporaire MariaDB"
