@@ -9,9 +9,14 @@ RESET = \033[0m
 NAME = inception
 ENV_FILE = ./srcs/.env
 DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
+DATA_DIRS = /home/edetoh/data/mariadb /home/edetoh/data/wordpress
 
 # Commands
-all: build up
+all: setup build up
+
+setup:
+	@printf "$(GREEN)Creating data directories if they don't exist...$(RESET)\n"
+	@mkdir -p $(DATA_DIRS)
 
 build:
 	@printf "$(GREEN)Building containers...$(RESET)\n"
