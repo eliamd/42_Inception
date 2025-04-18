@@ -1,5 +1,5 @@
 # ───────── MariaDB ─────────
-FROM debian:buster
+FROM debian:bullseye
 
 # Installation des paquets et configuration initiale
 RUN apt update -y && apt upgrade -y && \
@@ -13,6 +13,11 @@ RUN apt update -y && apt upgrade -y && \
 COPY conf/50-server.cnf /etc/mysql/mariadb.conf.d/50-server.cnf
 COPY tools/config.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/config.sh
+
+# S'assurer que le socket existe et est accessible
+RUN touch /run/mysqld/mysqld.sock && \
+    chown -R mysql:mysql /run/mysqld && \
+    chmod 777 /run/mysqld/mysqld.sock
 
 EXPOSE 3306
 

@@ -1,16 +1,16 @@
 # ───────── WordPress ─────────
-FROM debian:buster
+FROM debian:bullseye
 
 # Installation des paquets nécessaires
 RUN apt update -y && apt upgrade -y && \
     apt install -y \
-    php7.3 php-fpm php-mysqli mariadb-client \
+    php php-fpm php-mysqli mariadb-client \
     wget curl nano procps msmtp msmtp-mta && \
     rm -rf /var/lib/apt/lists/*
 
 # Configuration de PHP-FPM
 RUN mkdir -p /run/php
-COPY conf/www.conf /etc/php/7.3/fpm/pool.d/
+COPY conf/www.conf /etc/php/7.4/fpm/pool.d/
 
 # Installation de WordPress
 RUN wget https://fr.wordpress.org/wordpress-6.0-fr_FR.tar.gz -P /var/www && \

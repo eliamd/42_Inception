@@ -1,5 +1,5 @@
 # ───────── NGINX ─────────
-FROM debian:buster
+FROM debian:bullseye
 
 # Installation des paquets et configuration du certificat
 RUN apt update -y && apt upgrade -y && \
