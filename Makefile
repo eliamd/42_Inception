@@ -9,7 +9,7 @@ RESET = \033[0m
 NAME = inception
 ENV_FILE = ./srcs/.env
 DOCKER_COMPOSE = docker-compose -f ./srcs/docker-compose.yml
-DATA_DIRS = /home/edetoh/data/mariadb /home/edetoh/data/wordpress
+DATA_DIRS = /home/edetoh/data/mariadb /home/edetoh/data/wordpress /home/edetoh/data/adminer
 
 # Commands
 all: setup build up

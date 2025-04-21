@@ -19,6 +19,13 @@ volumes:
       type: none
       device: /home/edetoh/data/wordpress
       o: bind
+  adminer_data:
+    name: inception_adminer_data
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/edetoh/data/adminer
+      o: bind
 
 #─────────────── SERVICES ─────────────────────
 services:
@@ -63,10 +70,27 @@ services:
       - .env
     volumes:
       - wordpress_data:/var/www/wordpress
+      - adminer_data:/var/www/adminer
     depends_on:
       - wordpress
+      - adminer
     networks:
       - inception
     ports:
       - "443:443"
+      - "6969:6969"
+    restart: always
+
+  adminer:
+    build: ./adminer
+    container_name: adminer
+    image: adminer
+    env_file:
+      - .env
+    volumes:
+      - adminer_data:/var/www/adminer
+    depends_on:
+      - mariadb
+    networks:
+      - inception
     restart: always
